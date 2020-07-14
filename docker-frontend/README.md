@@ -32,4 +32,13 @@ Docker Container
     - reference (references /src in local folder)
     - reference (references /public in local folder)
 ```
-tesst
+
+So we are essentially mapping references to the files. Sometimes the docker volumes are harder to setup, so we don't do this with simpler projects.
+
+The essential "formula" for the docker volume command is:
+`docker run -it -p 3000:3000 -v /app/node_modules -v $(pwd):/app <image_id>`
+• `-v /app/node_modules`: put a bookmark on the `node_modules` folder    
+• `-v $(pwd):/app`: map the `pwd` into the `/app` folder    
+
+
+
