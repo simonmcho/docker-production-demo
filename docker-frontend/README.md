@@ -71,3 +71,31 @@ In our `Dockerfile.dev`, we have a command to copy everything in the pwd over to
 But, it's still worth having it because:
 1. It reminds the devops to copy over the folders if `docker-compose.yml` is no longer being used
 2. No more changes are needed in the pwd, especially if it's on production
+
+## Running tests
+We have an script command `test` that will execute tests. To do this manually, we can do the following:
+1. Build container - `docker build -f Dockerfile.dev .`
+2. Run container - `docker run -it containerId npm run test`
+
+By doing so, we can see the tests running. But we can't update tests and expect the container to know about these changes since it's a snapshot of the code when we built it.
+
+So, we need to run the following:
+1. Build, create, and start and attach container to service - `docker-compose up`
+2. Enter the running container and execute test command = `docker exec -it containerId npm run test`
+
+At this point, any changes to tests will automatically update. But there is a better way to do this using the `docker-compose.yml` file
+
+We updated the `docker-compose.yml` file to include a new service:
+```
+ tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - /app/node_modules
+      - .:/app
+    command: ["npm", "run", "test"]
+```
+
+We are using the same dockerfile and same volumes, except the command is different. Now we can run `docker-compose up --build` (`--build` just to ensure everything is built properly, a good thing to do when defining a new service to the yml file). At this point, we should have the app service running and accessible, as well as the test. And the tests can be live updated as well.
+
